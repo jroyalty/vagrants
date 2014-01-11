@@ -1,4 +1,4 @@
-vagrants
+Vagrants
 ========
 
 My Vagrant configs
