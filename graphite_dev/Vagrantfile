@@ -1,0 +1,43 @@
+# vim: set ft=ruby :
+
+## Local source code directory; to be mounted into "/vagrant/code" on the
+## guest.  Useful when using the vagrant box for developing code that 
+## you've got on your local (host) machine.
+LOCAL_CODE_DIR = ENV['VG_LOCAL_CODE_DIR']
+
+$provision_script = <<HERE
+#!/bin/bash
+
+apt-get update
+
+apt-get -y install git vim
+
+apt-get -y install python-cairo python-sqlite python-whisper python-pyparsing python-pip 
+apt-get -y install python-twisted python-zope.interface
+pip install "Django<1.7"
+pip install django-tagging
+
+echo "set -o vi" > /etc/profile.d/custom.sh
+echo "export EDITOR=$(which vim)" >> /etc/profile.d/custom.sh
+
+[[ -e /vagrant/graphite ]] || mkdir -p /vagrant/graphite
+
+## python setup.py install --prefix=/vagrant/graphite --install-lib=/vagrant/graphite/webapp
+HERE
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "precise64"
+    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    config.vm.network :forwarded_port, guest: 8083, host: 8083
+    config.vm.provision "shell", inline: $provision_script
+
+    ## Mount local code directory.
+    if !LOCAL_CODE_DIR.nil?
+	config.vm.synced_folder LOCAL_CODE_DIR, "/vagrant/code"
+    end
+
+    if Vagrant.has_plugin?("vagrant-cachier")
+	config.cache.auto_detect = true
+    end
+end
+
