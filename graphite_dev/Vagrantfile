@@ -28,8 +28,15 @@ HERE
 Vagrant.configure("2") do |config|
     config.vm.box = "precise64"
     config.vm.box_url = "http://files.vagrantup.com/precise64.box"
-    config.vm.network :forwarded_port, guest: 8083, host: 8083
     config.vm.provision "shell", inline: $provision_script
+
+    if Vagrant.has_plugin?("landrush")
+	config.landrush.enable
+	config.vm.hostname = "graphite.vagrant.dev"
+	config.vm.network "private_network", ip: "192.168.22.3"
+    end
+
+    config.vm.network :forwarded_port, guest: 8083, host: 8083
 
     ## Mount local code directory.
     if !LOCAL_CODE_DIR.nil?
