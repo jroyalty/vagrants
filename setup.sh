@@ -12,6 +12,7 @@ VG=$(which vagrant)
 ## List of plugins to install.
 PLUGINS=(
     vagrant-cachier
+    landrush
 )
 
 ## Plugins that are already installed.  We'll filter these out in the install
