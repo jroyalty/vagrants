@@ -1,0 +1,23 @@
+# vim: set ft=ruby :
+
+$provision_script = <<HERE
+#!/bin/bash
+
+apt-get -y update
+
+apt-get -y install git vim
+
+echo "set -o vi" > /etc/profile.d/custom.sh
+echo "export EDITOR=$(which vim)" >> /etc/profile.d/custom.sh
+HERE
+
+Vagrant.configure("2") do |config|
+    config.vm.box = "precise64"
+    config.vm.box_url = "http://files.vagrantup.com/precise64.box"
+    config.vm.provision "shell", inline: $provision_script
+
+    if Vagrant.has_plugin?("vagrant-cachier")
+	config.cache.auto_detect = true
+    end
+end
+
